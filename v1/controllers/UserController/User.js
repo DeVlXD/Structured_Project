@@ -1,7 +1,5 @@
 const asyncHandler = require("express-async-handler");
 const Model = require("../../../models/Index");
-const mongoose = require("mongoose");
-
 const User = Model.User;
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -15,8 +13,19 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("User already registered!")
     }
+    const user = await User.create({
+        username,
+        email, 
+        password
+    });
+    console.log(`User created ${user}`);
+    if(user){
+        res.status(201).json({_id: user.id, email: user.email});
+    } else{
+        res.status(400);
+        throw new Error("User data is not valid");
+    }
     res.json({message: "Register the user"});
-    // console.log("code is coming here");
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -71,6 +80,6 @@ const deleteUser = asyncHandler(async (req, res) => {
     res.status(200).json(user);
 });
 
-dbconnect();
+// dbconnect();
 
 module.exports = {getUser, loginUser, updateUser, deleteUser, registerUser, getUsers};
