@@ -10,6 +10,8 @@ dbconnect();
 
 app.use(express.json());
 
+app.use(express.urlencoded({ extended:false }));
+
 // 404, Not Found
 // app.use((req, res) => res.error(404, "NOT_FOUND"));
 
