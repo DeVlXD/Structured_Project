@@ -7,8 +7,8 @@ require('dotenv').config();
 // const s3Client = new S3Client({
 //     region: "ap-south-1",
 //     credentials: {
-//         accessKeyId: "AKIATY4E6HPOX5IIV753",
-//         secretAccessKey: "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",
+//         accessKeyId: ",
+//         secretAccessKey: "",
 //     },
 // });
 // const s3 = new S3Client();
@@ -19,25 +19,26 @@ aws.config.update({
 });
 let s3 = new aws.S3();
 
+var upload = multer({
+    storage: multerS3({
+        s3: s3,
+        acl: 'public-read',
+        bucket: process.env.AWS_BUCKET,
+        key: function (req, file, cb) {
+            console.log(file);
+            cb(null, (Date.now() + file.originalname)); //using Date.now() for unique file keys
+        }
+    })
+});
+
 module.exports.uploadSingle = multer({
     storage: multerS3({
         s3: s3,
+        acl: 'public-read',
         bucket: process.env.AWS_BUCKET,
-        acl : "public-read",
         key: function (req, file, cb) {
-            s3.deleteObject({
-                bucket: process.env.AWS_BUCKET,
-                Key: file.originalname
-            }, function (err) {
-                if (err) {
-                    console.log("Image not found");
-                }
-                console.log("success");
-                
-            });
-            setTimeout(() => {
-                cb(null, (Date.now() + file.originalname)); //using Date.now() for unique file keys
-            }, 200);
+            console.log(file);
+            cb(null, (Date.now() + file.originalname)); //using Date.now() for unique file keys
         }
     }),
     limits: {
@@ -52,6 +53,7 @@ module.exports.uploadMany = multer({
         ACL : "public-read",
         key: function (req, files, cb) {
             if(files.fieldname == "files"){
+                console.log(req.files);
                 let fileName = files.originalname;
                 s3.deleteObject({
                     bucket: process.env.AWS_BUCKET,
