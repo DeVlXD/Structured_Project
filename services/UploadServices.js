@@ -1,17 +1,29 @@
 const multerS3 = require('multer-s3');
 const multer = require("multer");
 const aws = require("aws-sdk");
+const { S3Client } = require('@aws-sdk/client-s3');
+require('dotenv').config();
+
+// const s3Client = new S3Client({
+//     region: "ap-south-1",
+//     credentials: {
+//         accessKeyId: "AKIATY4E6HPOX5IIV753",
+//         secretAccessKey: "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",
+//     },
+// });
+// const s3 = new S3Client();
 
 aws.config.update({
     secretAccessKey: process.env.AWS_SECRET,
     accessKeyId: process.env.AWS_KEY
 });
 let s3 = new aws.S3();
+
 module.exports.uploadSingle = multer({
     storage: multerS3({
         s3: s3,
         bucket: process.env.AWS_BUCKET,
-        ACL : "public-read",
+        acl : "public-read",
         key: function (req, file, cb) {
             s3.deleteObject({
                 bucket: process.env.AWS_BUCKET,
