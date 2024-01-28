@@ -44,7 +44,6 @@ module.exports.loginUser = async (req, res, next) => {
     try {
         const {email, password} = req.body;
         if(!email || !password){
-            res.status(400);
             throw new Error("All fields are mandatory!");
         }
         const user = await User.findOne({email});
@@ -56,11 +55,10 @@ module.exports.loginUser = async (req, res, next) => {
                 jti: user.jti,
                 secretId: req.headers.deviceId
             })
-            res.status(200).json({accessToken});
+            res.json({accessToken});
         } else{
-        res.status(401);
-        throw new Error(constants.INVALID_CREDENTIALS);
-    }
+            throw new Error(constants.INVALID_CREDENTIALS);
+        }
     } catch (error) {
         next(error);
     }
